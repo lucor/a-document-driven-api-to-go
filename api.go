@@ -48,11 +48,11 @@ func main() {
 	router := mux.NewRouter()
 
 	// Task endpoints
-	router.Handle("/tasks", http.HandlerFunc(TasksHandler)).Methods(http.MethodGet)
-	router.Handle("/tasks", http.HandlerFunc(CreateTaskHandler)).Methods(http.MethodPost)
-	router.Handle("/task/{taskID}", http.HandlerFunc(GetTaskHandler)).Methods(http.MethodGet)
-	router.Handle("/task/{taskID}", http.HandlerFunc(EditTaskHandler)).Methods(http.MethodPut)
-	router.Handle("/task/{taskID}", http.HandlerFunc(DeleteTaskHandler)).Methods(http.MethodDelete)
+	router.HandleFunc("/tasks", TasksHandler).Methods(http.MethodGet)
+	router.HandleFunc("/tasks", CreateTaskHandler).Methods(http.MethodPost)
+	router.HandleFunc("/task/{taskID}", GetTaskHandler).Methods(http.MethodGet)
+	router.HandleFunc("/task/{taskID}", EditTaskHandler).Methods(http.MethodPut)
+	router.HandleFunc("/task/{taskID}", DeleteTaskHandler).Methods(http.MethodDelete)
 
 	// Serve static files: this will serve our docs under http://localhost:9999/static/docs/
 	router.PathPrefix("/static/").Handler(
