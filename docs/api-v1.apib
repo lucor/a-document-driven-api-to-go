@@ -1,0 +1,87 @@
+FORMAT: 1A
+HOST: http://todo.local/api
+
+# Another TODO
+
+Another TODO API is that, another TODO API.
+
+# Group Tasks
+
+Resources related to the tasks in the API.
+
+## Tasks Collection [/tasks]
+
+### List All Tasks [GET]
+
++ Response 200 (application/json)
+
+    + Attributes (array [Task])
+
+### Create a New Task [POST]
+
++ Attributes
+    + description: `Buy milk` (string, required) - Task description
+    + completed: false (boolean, required) - Done status
+
++ Request (application/json)
+
+        {
+          "description": "Buy milk",
+          "completed": false
+        }
+
++ Response 201 (application/json)
+
+    + Attributes (Task)
+
++ Response 422 (application/json)
+
+        {
+          "error": "Unprocessable entity",
+          "message": "an error message"
+        }
+
+## Task [/tasks/{taskId}]
+
++ Parameters
+
+  + taskId: `6ba7b810-9dad-11d1-80b4-00c04fd430c8` (string) - ID if the task
+
+### View a Task [GET]
+
++ Response 200 (application/json)
+
+    + Attributes (Task)
+
++ Response 404
+
+### Edit a Task [PUT]
+
++ Attributes
+    + description: `Buy milk` (string) - Task description
+    + completed: true (boolean, required) - Done status
+
++ Request (application/json)
+
+        {
+            "description": "Buy milk",
+            "completed": true
+        }
+
++ Response 200 (application/json)
+
+    + Attributes (Task)
+
+### Delete a Task [DELETE]
+
++ Response 204
+
+## Data Structures
+
+### Task
+
++ id: `6ba7b810-9dad-11d1-80b4-00c04fd430c8` (string, required) - Task's ID
++ description: `Buy milk` (string, required) - Task's description
++ completed: false (boolean, required) - Done status
++ createdAt: `2017-04-09T16:30:42+00:00` (string, required) - Task's created date
++ updatedAt: `2017-04-09T16:30:42+00:00` (string, required) - Task's update date

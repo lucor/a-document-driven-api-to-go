@@ -1,0 +1,586 @@
+A Document Driven API to Go
+DevDay Caserta
+21 Apr 2017
+Footer: || [#]
+
+
+Luca Corbo
+ScientiaMobile
+
+@lucacorbo
+https://lucacorbo.com
+
+
+* Outline
+
+We'll go through the life cycle of a simple but fully functional web API:
+
+- Design
+- Document
+- Test
+- Develop
+
+* Design & Document
+
+* API Description Languages
+
+.quote API Description Languages are formal languages designed to provide a structured description of a web API that is useful both to a human and for automated machine processing. ^*^
+
+
+Additional advantages:
+
+- generate different output (i.e. HTML)
+- allow automated testing
+- can provide mock server
+- dedicated editors
+
+.footnote ^*^ [[https://en.wikipedia.org/wiki/Overview_of_RESTful_API_Description_Languages]]
+
+* OpenAPI Initiative (Swagger) - https://openapis.org
+
+- Open governance structure under the Linux Foundation.
+- Based on the Swagger Specification donated by SmartBear Software.
+
+.image images/openapi-members.png _ 800
+
+* OpenAPI Specification
+
+    /pet/{petId}:
+        get:
+          summary: "Find pet by ID"
+          description: "Returns a single pet"
+          operationId: "getPetById"
+          produces:
+          - "application/json"
+          parameters:
+          - name: "petId"
+            in: "path"
+            description: "ID of pet to return"
+            required: true
+            type: "integer"
+            format: "int64"
+          responses:
+            200:
+              description: "successful operation"
+              schema:
+                $ref: "#/definitions/Pet"
+            400:
+              description: "Invalid ID supplied"
+            404:
+              description: "Pet not found"
+
+* OpenAPI Specification - Objects
+
+    Pet:
+        type: "object"
+        required:
+        - "name"
+        - "photoUrls"
+        properties:
+          id:
+            type: "integer"
+            format: "int64"
+          category:
+            $ref: "#/definitions/Category"
+          name:
+            type: "string"
+          status:
+            type: "string"
+            description: "pet status in the store"
+            enum:
+            - "available"
+            - "pending"
+            - "sold"
+
+* OpenAPI - Swagger Editor
+
+.image images/swagger-editor-code.png
+
+* OpenAPI - Swagger HTML output
+
+.image images/swagger-editor-html.png
+
+* OpenAPI - Swagger endpoint details
+
+.image images/swagger-editor-html-endpoint-detail.png
+
+* OpenAPI - Swagger endpoint responses
+
+.image images/swagger-editor-html-endpoint-responses.png _ 800
+
+* API Blueprint - https://apiblueprint.org
+
+- Open source description language for web APIs
+- Supported by Apiary, now acquired by Oracle
+- Syntax based on markdown
+
+* The application
+
+* A TODO application endpoints
+
+Get all tasks
+
+  GET /tasks
+
+Add a task
+
+  POST /tasks
+
+Get a task
+
+  GET /tasks/{id}
+
+Edit a task
+
+    PUT /tasks/{id}
+
+Delete a task
+
+  DELETE /tasks/{id}
+
+
+* API Blueprint - Metadata
+
+  FORMAT: 1A
+  HOST: http://todo.local/api
+
+  # Another TODO
+
+  Another TODO API is that, another TODO API.
+
+* API Blueprint - Resources
+
+  # Group Tasks
+
+  Resources related to the tasks in the API.
+
+  ## Tasks Collection [/tasks]
+
+  ### List All Tasks [GET]
+
+  + Response 200 (application/json)
+
+      [
+          {
+              "id": "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
+              "description": "Buy milk",
+              "completed": false,
+          },
+          {
+              "id": "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
+              "description": "Buy milk",
+              "completed": false,
+          },
+      ]
+
+* API Blueprint - Data Structures
+
+  ## Data Structures
+
+  ### Task
+
+  + id: `6ba7b810-9dad-11d1-80b4-00c04fd430c8` (string, required) - Task's ID
+  + description: `Buy milk` (string, required) - Task's description
+  + completed: false (boolean, required) - Done status
+  + createdAt: `2017-04-09T16:30:42+00:00` (string, required) - Task's created date
+  + updatedAt: `2017-04-09T16:30:42+00:00` (string, required) - Task's update date
+
+* API Blueprint - Resources with Data Structures
+
+  # Group Tasks
+
+  Resources related to the tasks in the API.
+
+  ## Tasks Collection [/tasks]
+
+  ### List All Tasks [GET]
+
+  + Response 200 (application/json)
+
+      + Attributes (array [Task])
+
+* API Blueprint - Create a task
+
+  ## Tasks Collection [/tasks]
+
+  ...
+
+  ### Create a New Task [POST]
+
+  + Attributes
+      + description: `Buy milk` (string, required) - Task description
+      + completed: false (boolean, required) - Done status
+
+  + Request (application/json)
+
+      {
+        "description": "Buy milk",
+        "completed": false
+      }
+
+  + Response 201 (application/json)
+
+      + Attributes (Task)
+
+* API Blueprint - Error responses
+
+  ### Create a New Task [POST]
+
+  + Attributes
+      + description: `Buy milk` (string, required) - Task description
+      + completed: false (boolean, required) - Done status
+
+  + Request (application/json)
+
+      {
+        "description": "Buy milk",
+        "completed": false
+      }
+
+  + Response 201 (application/json)
+
+      + Attributes (Task)
+
+  + Response 422 (application/json)
+
+      {
+        "error": "Unprocessable entity",
+        "message": "an error message"
+      }
+
+* API Blueprint - Get a Task
+
+  ## Task [/tasks/{taskId}]
+
+  + Parameters
+
+    + taskId: `6ba7b810-9dad-11d1-80b4-00c04fd430c8` (string, required) - ID if the task
+
+  ### View a Task [GET]
+
+  + Response 200 (application/json)
+
+      + Attributes (Task)
+
+  + Response 404
+
+* API Blueprint - Edit a Task
+  
+  ## Task [/tasks/{taskId}]
+
+  ...
+
+  ### Edit a Task [PUT]
+
+  + Attributes
+      + description: `Buy milk` (string, required) - Task description
+      + completed: true (boolean, required) - Done status
+
+  + Request (application/json)
+
+          {
+              "description": "Buy milk",
+              "completed": true
+          }
+
+  + Response 200 (application/json)
+
+      + Attributes (Task)
+
+* API Blueprint - Delete a Task
+
+  ## Task [/tasks/{taskId}]
+
+  ...
+
+  ### Delete a Task [DELETE]
+
+  + Response 204
+
+
+* Great, and now ?
+
+* Generate an HTML version
+
+.quote Aglio: an API Blueprint renderer that supports multiple themes and outputs static HTML that can be served by any web host ^*^
+
+Using docker:
+
+  docker run --rm -v $PWD:/data lucor/aglio \
+    -i docs/api-v1.apib \
+    -o public/docs/index.html \
+    --theme-full-width
+
+Using the executable:
+
+  npm install -g aglio 
+
+  aglio -i docs/api-v1.apib \
+        -o public/docs/index.html \
+        --theme-full-width
+
+.footnote ^*^ [[https://github.com/danielgtaylor/aglio]]
+
+* The static HTML version!
+
+.image images/blueprint-html.png _ 1000
+
+* The static HTML version - some details
+
+.image images/blueprint-html-post.png _ 800
+
+* Mock server
+
+.quote Snowboard an API Blueprint toolkit in Go ^*^
+
+  docker run -it -v $PWD:/doc -p 8087:8087 bukalapak/snowboard mock -b :8087 docs/api-v1.apib
+
+  Mock server is ready. Use :8087
+  Available Routes:
+  GET      200	/tasks
+  POST     201	/tasks
+  POST     422	/tasks
+  GET      200	/tasks/:taskId
+  GET      404	/tasks/:taskId
+  PUT      200	/tasks/:taskId
+  DELETE   204	/tasks/:taskId
+
+.footnote ^*^ [[https://github.com/bukalapak/snowboard]]
+
+* Test the Mock server
+
+  curl http://127.0.0.1:8087/tasks
+
+  [
+    {
+      "id": "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
+      "description": "Buy milk",
+      "completed": false,
+      "createdAt": "2017-04-09T16:30:42+00:00",
+      "updatedAt": "2017-04-09T16:30:42+00:00"
+    }
+  ]
+
+* Test the Mock server: multiple responses
+
+  curl -v -X POST -H "X-Status-Code: 422" http://127.0.0.1:8087/tasks
+
+  *   Trying 127.0.0.1...
+  * Connected to 127.0.0.1 (127.0.0.1) port 8087 (#0)
+  > POST /tasks HTTP/1.1
+  > Host: 127.0.0.1:8087
+  > User-Agent: curl/7.47.0
+  > Accept: */*
+  > X-Status-Code: 422
+
+  < HTTP/1.1 422 Unprocessable Entity
+  < Content-Type: application/json
+  < Date: Sat, 07 Apr 2018 18:42:05 GMT
+  < Content-Length: 71
+
+  {
+    "error": "Unprocessable entity",
+    "message": "an error message"
+  }
+
+* Develop and Test in Golang
+
+* Project structure
+
+  tree $GOPATH/src/github.com/lucor/document-driven-api-to-go
+  .
+  ├── api.go
+  ├── api_test.go
+  ├── docs
+  │   └── api-v1.apib
+  ├── Gopkg.lock
+  ├── Gopkg.toml
+  ├── public
+  │   └── docs
+  │       └── index.html
+  └── vendor
+      └── ...
+
+To test and run our application:
+
+  go test -v                  //runs tests
+  go run api.go               //compiles and runs the main package 
+
+* Dependency manager tool - Dep
+
+Dep is a tool for managing dependencies for Go projects
+
+.image images/MovingGopher.png 200 200
+.caption 
+
+Examples:
+
+      dep init                               set up a new project
+      dep ensure                             install the project's dependencies
+      dep ensure -update                     update the locked versions of all dependencies
+      dep ensure -add github.com/pkg/errors  add a dependency to the project
+
+.footnote Dep website: [[https://golang.github.io/dep/]] | _Gopher_ by [[https://github.com/ashleymcnamara/gophers][Ashley McNamara]]
+
+* Gopkg.toml
+
+.code Gopkg.toml
+
+* Gopkg.lock
+
+.code Gopkg.lock /# This/,/1.2.0"$/
+
+* api.go - Serve the API documentation
+
+  package main
+
+  import (  
+    "net/http"  
+    "github.com/gorilla/mux"
+  )
+
+  func main() {
+    // Create the router
+    router := mux.NewRouter()
+
+    // Serve static files: this will serve our docs under http://localhost:9999/static/docs/
+    router.PathPrefix("/static/").Handler(
+      http.StripPrefix("/static/", http.FileServer(http.Dir("public"))),
+    )
+
+    log.Fatal(http.ListenAndServe(":9999", router))
+  }
+
+* api.go - Define the routes
+
+  // storage is a map used to simulate our storage system
+  var storage map[string]Task
+
+  func main() {
+
+    // Initialize the storage map
+    storage = make(map[string]Task)
+    
+    // Create the router
+    router := mux.NewRouter()
+
+    // Task endpoints
+    router.Handle("/tasks", http.HandlerFunc(TasksHandler)).Methods(http.MethodGet)
+    router.Handle("/tasks", http.HandlerFunc(CreateTaskHandler)).Methods(http.MethodPost)
+    router.Handle("/task/{taskID}", http.HandlerFunc(GetTaskHandler)).Methods(http.MethodGet)
+    router.Handle("/task/{taskID}", http.HandlerFunc(EditTaskHandler)).Methods(http.MethodPut)
+    router.Handle("/task/{taskID}", http.HandlerFunc(DeleteTaskHandler)).Methods(http.MethodDelete)
+    ...
+
+* api.go - Define the structs
+
+  // Task represents a Task
+  type Task struct {
+    ID          string `json:"id"`
+    Description string `json:"description"`
+    Completed   bool   `json:"completed"`
+    CreatedAt   string `json:"createdAt"`
+    UpdatedAt   string `json:"updatedAt"`
+  }
+
+  // TaskRequestOptions represents the options used to create or edit Task
+  type TaskRequestOptions struct {
+    Description string `json:"description"`
+    Completed   bool   `json:"completed"`
+  }
+
+  // ErrorResponse represents an error response
+  type ErrorResponse struct {
+    Message string `json:"message"`
+    Error   string `json:"error"`
+  }
+
+# Get all tasks section
+
+* api.go - Tasks Handler
+
+.code api.go /// TasksHandler/,/^}/
+
+* Testing tool - Golang Package Testing
+
+- We don't need external tools.
+- Package testing provides support for automated testing of Go packages.
+- Tests are functions that reside in a package's *_test.go* files.
+- Tests are excluded from regular package builds.
+
+  go test -v
+  === RUN   TestTasksHandler
+  --- PASS: TestTasksHandler (0.00s)
+  === RUN   TestCreateTaskHandler
+  --- PASS: TestCreateTaskHandler (0.00s)
+  === RUN   TestGetTaskHandler
+  --- PASS: TestGetTaskHandler (0.00s)
+  === RUN   TestEditTaskHandler
+  --- PASS: TestEditTaskHandler (0.00s)
+  === RUN   TestDeleteTask
+  --- PASS: TestDeleteTask (0.00s)
+  PASS
+  ok  	github.com/lucor/document-driven-api-to-go	0.003s
+
+
+* Testing the handlers
+
+  import (
+    "net/http/httptest"
+    "testing"
+  )
+
+  func TestTasksHandler(t *testing.T) {
+    // setup the test environment
+    setup()
+
+    // create an HTTP request
+    req := httptest.NewRequest(http.MethodGet, "/tasks", nil)
+
+    // create an HTTP response recorder
+    rr := httptest.NewRecorder()
+
+    // invoke the handler
+    TasksHandler(rr, req)
+
+    // assertions using the response recorder
+    if status := rr.Code; status != http.StatusOK {
+      t.Errorf("wrong status code: got %v want %d", status, http.StatusOK)
+    }
+    ...
+
+* api_test.go - The setup function
+
+.code api_test.go /func setup/,/^}/
+
+* api_test.go - Tasks Handler Test Assertions
+
+.code api_test.go /// START code/,/// END code/
+
+# create task section
+
+* api.go - Create Task Handler (1/2)
+
+.code api.go /// CreateTaskHandler/,/^	}/
+
+* api.go - Create Task Handler (2/2)
+
+.code api.go /// Create the Task/,/^}/
+
+* api_test.go - Create Task Handler Test (1/2)
+
+.code api_test.go /// TestCreateTaskHandler/,/req\)/
+
+* api_test.go - Create Task Handler Test (2/2)
+
+.code api_test.go ///if status/,/^}/
+
+# delete task section
+
+* api.go - Delete Task Handler
+
+.code api.go /// DeleteTaskHandler/,/^}/
+
+* api.go - Delete Task Handler Test
+
+.code api_test.go /// TestDeleteTaskHandler/,/^}/
