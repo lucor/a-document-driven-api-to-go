@@ -499,7 +499,7 @@ Examples:
 
 * api.go - Tasks Handler
 
-.code api.go /// TasksHandler/,/^}/
+.code api.go /// TasksHandler\(/,/^}/
 
 * Testing tool - Golang Package Testing
 
@@ -561,7 +561,7 @@ Examples:
 
 * api.go - Create Task Handler (1/2)
 
-.code api.go /// CreateTaskHandler/,/^	}/
+.code api.go /CreateTaskHandler\(/,/^	}/
 
 * api.go - Create Task Handler (2/2)
 
@@ -579,7 +579,7 @@ Examples:
 
 * api.go - Delete Task Handler
 
-.code api.go /// DeleteTaskHandler/,/^}/
+.code api.go /DeleteTaskHandler\(/,/^}/
 
 * api.go - Delete Task Handler Test
 
